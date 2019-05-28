@@ -5,6 +5,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ *
+ */
 public class ConditionVarBlocker implements Blocker {
 
     private final Lock lock;
@@ -28,8 +31,10 @@ public class ConditionVarBlocker implements Blocker {
         try {
             final Predicate guard = guardedAction.guard;
             while (!guard.evaluate()) {
+                // 如果没连接上, 则阻塞, 等到 ConnectingThread 连接上调用 signal
                 condition.await();
             }
+            // 如果连接上, 直接发
             result = guardedAction.call();
             return result;
         } finally {

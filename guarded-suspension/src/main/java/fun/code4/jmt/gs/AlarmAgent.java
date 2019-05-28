@@ -5,6 +5,9 @@ import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
 public class AlarmAgent {
+    /**
+     * 是否连接到报警服务器
+     */
     private volatile boolean connectedToServer = false;
 
     private final Predicate agentConnected = new Predicate() {
@@ -14,10 +17,23 @@ public class AlarmAgent {
         }
     };
 
+    /**
+     * 守卫, 用于在连接到服务器之前, 阻塞其他线程发送消息
+     */
     private final Blocker blocker = new ConditionVarBlocker();
 
+    /**
+     * Daemon线程, 用于心跳检测
+     */
     private final Timer heartbeatTimer = new Timer(true);
 
+    /**
+     * 发送报警消息, 守卫会先检查前提条件(predicate)是否满足:
+     * 若满足, 则执行 doSendAlarm 发送实际消息
+     * 若不满足, 则阻塞调用线程(caller)
+     * @param alarm
+     * @throws Exception
+     */
     public void sendAlarm(final AlarmInfo alarm) throws Exception {
         GuardedAction<Void> guardedAction = new GuardedAction<Void>(agentConnected) {
             @Override
@@ -29,7 +45,13 @@ public class AlarmAgent {
         blocker.callWithGuard(guardedAction);
     }
 
+    /**
+     * 发送实际的报警消息, 调用此方法的前提使, 报警服务器已经调用成功
+     * @param alarm
+     */
     private void doSendAlarm(AlarmInfo alarm) {
+        System.out.println("Sending alarm  " + alarm);
+        // 模拟发送到服务器的耗时
         try {
             Thread.sleep(50);
         } catch (InterruptedException e) {
@@ -37,6 +59,11 @@ public class AlarmAgent {
         }
     }
 
+    /**
+     * 初始化:
+     * 1. 开启服务器连接线程
+     * 2. 60 秒后开启一个 2 秒间隔的心跳线程 (Daemon)
+     */
     public void init() {
         Thread connectingThread = new Thread(new ConnectingTask());
         connectingThread.start();
@@ -47,6 +74,9 @@ public class AlarmAgent {
         connectedToServer = false;
     }
 
+    /**
+     * 连接成功后的 hook
+     */
     protected void onConnected() {
         try {
             blocker.signalAfter(new Callable<Boolean>() {
@@ -69,6 +99,9 @@ public class AlarmAgent {
 
         @Override
         public void run() {
+            // 省略其他代码
+
+            // 模拟连接耗时
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
