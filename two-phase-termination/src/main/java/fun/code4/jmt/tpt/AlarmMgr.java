@@ -38,4 +38,12 @@ public class AlarmMgr {
         alarmSendingThread.terminate();
         shutdownRequested = true;
     }
+
+    public synchronized void shutdown(boolean waitUntilThreadTerminated) {
+        if (shutdownRequested) {
+            throw new IllegalStateException("shutdown already requested!");
+        }
+        alarmSendingThread.terminate(waitUntilThreadTerminated);
+        shutdownRequested = true;
+    }
 }
