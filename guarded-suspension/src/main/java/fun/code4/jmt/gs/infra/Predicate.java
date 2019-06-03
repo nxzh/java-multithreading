@@ -1,4 +1,4 @@
-package fun.code4.jmt.gs;
+package fun.code4.jmt.gs.infra;
 
 /**
  * 条件

@@ -11,6 +11,7 @@
     <modules>
         <module>immutable-object</module>
         <module>guarded-suspension</module>
+        <module>two-phase-termination</module>
     </modules>
 
     <properties>

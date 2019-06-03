@@ -1,4 +1,4 @@
-package fun.code4.jmt.gs;
+package fun.code4.jmt.gs.infra;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Condition;

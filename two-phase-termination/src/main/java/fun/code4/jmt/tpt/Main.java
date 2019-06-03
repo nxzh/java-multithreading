@@ -32,6 +32,6 @@ public class Main {
             threads[i].start();
         }
         Thread.sleep(2000);
-        alarmMgr.shutdown(true);
+        alarmMgr.shutdown();
     }
 }
