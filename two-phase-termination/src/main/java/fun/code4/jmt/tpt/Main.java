@@ -31,6 +31,7 @@ public class Main {
             threads[i].setName("Worker thread + " + i);
             threads[i].start();
         }
-        //alarmMgr.shutdown();
+        Thread.sleep(2000);
+        alarmMgr.shutdown(true);
     }
 }

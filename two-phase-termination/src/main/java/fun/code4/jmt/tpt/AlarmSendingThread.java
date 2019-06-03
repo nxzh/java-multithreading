@@ -27,6 +27,7 @@ public class AlarmSendingThread extends AbstractTerminatableThread {
         alarm = alarmQueue.take();
         terminationToken.reservations.decrementAndGet();
         try {
+            Thread.sleep(1000);
             alarmAgent.sendAlarm(alarm);
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,6 +46,7 @@ public class AlarmSendingThread extends AbstractTerminatableThread {
         AlarmType type = alarmInfo.getType();
         String id = alarmInfo.getId();
         String extraInfo = alarmInfo.getExtraInfo();
+        // 关闭之后不再接受新请求
         if (terminationToken.isToShutdown()) {
             System.out.println("rejected alarm:" + id + "," + extraInfo);
             return -1;
