@@ -1,4 +1,4 @@
-package fun.code4.jmt.promise;
+package fun.code4.jmt.promise.threadpool;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -8,9 +8,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FTPClientUtil {
@@ -21,8 +19,21 @@ public class FTPClientUtil {
 
     private static AtomicInteger atomicCount = new AtomicInteger(0);
 
-    private FTPClientUtil() {
+    private volatile static ThreadPoolExecutor threadPoolExecutor;
 
+    private FTPClientUtil() {
+    }
+
+    static {
+        threadPoolExecutor = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors() * 2, 60, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(10), new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        }, new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     public static Future<FTPClientUtil> newInstance(String ftpServer, String username, String password) {
@@ -37,9 +48,7 @@ public class FTPClientUtil {
         };
 
         final FutureTask<FTPClientUtil> task = new FutureTask<FTPClientUtil>(callable);
-        Thread thread = new Thread(task);
-        thread.setName("... FTP Initial Thread + " + atomicCount.addAndGet(1));
-        thread.start();
+        threadPoolExecutor.execute(task);
         return task;
     }
 

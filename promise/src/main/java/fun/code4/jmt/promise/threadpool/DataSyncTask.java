@@ -1,11 +1,9 @@
-package fun.code4.jmt.promise;
-
+package fun.code4.jmt.promise.threadpool;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class DataSyncTask implements Runnable {
     private final Map<String, String> taskParameters;
