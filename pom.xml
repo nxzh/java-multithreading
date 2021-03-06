@@ -13,6 +13,7 @@
         <module>guarded-suspension</module>
         <module>two-phase-termination</module>
         <module>promise</module>
+        <module>basic</module>
     </modules>
 
     <properties>
